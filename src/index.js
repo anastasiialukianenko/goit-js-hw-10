@@ -1,4 +1,6 @@
-import { fetchBreeds, fetchCatByBreed} from "./cat-api";
+import { fetchBreeds, fetchCatByBreed } from "./cat-api";
+import Notiflix from 'notiflix';
+
 
 
 const refs = {
@@ -8,6 +10,7 @@ const refs = {
     catInfoEl: document.querySelector('.cat-info'),
 };
 
+hideError();
 
   fetchBreeds()
     .then(breeds => {
@@ -17,9 +20,10 @@ const refs = {
         option.textContent = breed.name;
         refs.selectEl.appendChild(option);
       });
+      refs.loaderEl.classList.add('hidden');
     })
     .catch(error => {
-      console.error('Error fetching breeds:', error);
+      showError();
     });
 
 refs.selectEl.addEventListener('change', changeOnSelect);
@@ -28,11 +32,15 @@ refs.selectEl.addEventListener('change', changeOnSelect);
 function changeOnSelect(event) {
     event.preventDefault();
 
-    const selectedBreedId = event.target.value;
+  const selectedBreedId = event.target.value;
+   refs.loaderEl.classList.remove('hidden');
    
   fetchCatByBreed(selectedBreedId).then(catData => {
     createCatdescription(catData);
-    }).catch(err => console.log(err))
+    refs.loaderEl.classList.add('hidden');
+    }).catch(err => {
+       showError();
+    })
 }
 
 
@@ -47,21 +55,11 @@ function createCatdescription(catData) {
   })
 }
 
-
-
-// (event) => {
-//   const selectedBreedId = event.target.value;
-
-//   fetchCatByBreed(selectedBreedId)
-    // .then(catData => {
-    //   catInfoDiv.innerHTML = `
-    //     <img src="${catData.url}" alt="Cat Image">
-    //     <h3>${catData.breeds[0].name}</h3>
-    //     <p>${catData.breeds[0].description}</p>
-    //     <p>Temperament: ${catData.breeds[0].temperament}</p>
-    //   `;
-    // })
-//     .catch(error => {
-//       console.error('Error fetching cat by breed:', error);
-//     });
-// });
+function hideError() {
+  refs.errorEl.classList.add('hidden');
+}
+function showError() {
+  Notiflix.Notify.failure(`${refs.errorEl.textContent}`);
+  refs.errorEl.classList.remove('hidden');
+   refs.loaderEl.classList.add('hidden');
+}
