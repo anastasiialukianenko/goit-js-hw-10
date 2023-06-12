@@ -36,6 +36,11 @@ function changeOnSelect(event) {
    refs.loaderEl.classList.remove('hidden');
    
   fetchCatByBreed(selectedBreedId).then(catData => {
+ if (catData.length === 0) {
+        showError();
+        refs.catInfoEl.innerHTML = '';
+    }
+
     createCatdescription(catData);
     refs.loaderEl.classList.add('hidden');
     }).catch(err => {
@@ -43,10 +48,8 @@ function changeOnSelect(event) {
     })
 }
 
-
 function createCatdescription(catData) {
   catData.forEach(cat => {
-    console.dir(cat)
     refs.catInfoEl.innerHTML = `
         <img src="${cat.url}" alt="Cat Image" width="500">
         <h3>${cat.breeds[0].name}</h3>
@@ -60,6 +63,5 @@ function hideError() {
 }
 function showError() {
   Notiflix.Notify.failure(`${refs.errorEl.textContent}`);
-  refs.errorEl.classList.remove('hidden');
    refs.loaderEl.classList.add('hidden');
 }
